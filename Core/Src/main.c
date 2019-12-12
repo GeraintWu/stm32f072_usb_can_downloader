@@ -95,18 +95,18 @@ int main(void)
   MX_CAN_Init();
   /* USER CODE BEGIN 2 */
   CAN_Filter_Init();
-
+  message_buffer_init();
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  download_app();
 
   while (1)
   {
     /* USER CODE END WHILE */
-
     /* USER CODE BEGIN 3 */
-
+#if 0
 	usb_tx_buf.msg.cmd = 0x05;
 	usb_tx_buf.msg.length = 10;
 	i=0;
@@ -114,7 +114,7 @@ int main(void)
 	while(1)
 	{
 
-      if(usb_rx_buf.msg.cmd == 'A')
+      if(usb_rx_buf.msg.cmd & 0x00000041 == 'A')
       {
     	//memset(usb_rx_buf.packet, 0, 64);
 	    memcpy(usb_tx_buf.packet, usb_rx_buf.packet, 64);
@@ -123,10 +123,11 @@ int main(void)
 #ifdef __DEBUG_PRINTF__
 	 printf("usb data sent!\n");
 #endif
-      }
 
+      }
 	  //HAL_Delay(1500);
 	}
+#endif
   }
   /* USER CODE END 3 */
 }

@@ -16,10 +16,14 @@ extern uint8_t USBD_CUSTOM_HID_SendReport(USBD_HandleTypeDef *pdev,
                                    uint8_t *report,
                                    uint16_t len);
 
+static uint8_t payload_1[56]; /* pc -> st -> nxp */
+static uint8_t payload_2[56]; /* nxp -> sy -> pc */
+
 usb_message_t usb_tx_buf;
 usb_message_t usb_rx_buf;
 can_message_t can_tx_buf;
 can_message_t can_rx_buf;
+bool g_usb_rx_complete;
 
 volatile static uint8_t can_tx_complete;
 static CAN_FilterTypeDef sFilterConfig;
@@ -27,6 +31,14 @@ static CAN_TxHeaderTypeDef can_tx_hd;
 static CAN_RxHeaderTypeDef can_rx_hd;
 static uint32_t messagebox;
 
+
+void message_buffer_init(void)
+{
+	usb_rx_buf.msg.data = payload_1;
+	can_tx_buf.data = payload_1;
+	usb_tx_buf.msg.data = payload_2;
+	can_rx_buf.data = payload_2;
+}
 
 
 /*FUNCTION**********************************************************************
@@ -161,6 +173,7 @@ void USB_Receive_Callback(uint8_t event_idx, uint8_t state)
 
 	//USBD_CUSTOM_HID_HandleTypeDef *hhid = hUsbDeviceFS.pClassData;
 	memcpy(usb_rx_buf.packet, hUsbDeviceFS.pClassData, 64);
+	g_usb_rx_complete = 1;
 #ifdef __DEBUG_PRINTF__
 	printf("usb data received!\n");
 #endif

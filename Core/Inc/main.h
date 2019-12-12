@@ -34,7 +34,7 @@ extern "C" {
 /* USER CODE BEGIN Includes */
 #include "usb_device.h"
 #include <driver_user_if.h>
-
+#include <stdbool.h>
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -54,7 +54,7 @@ extern "C" {
 
 /* Exported functions prototypes ---------------------------------------------*/
 void Error_Handler(void);
-
+extern void download_app(void);
 #ifdef __DEBUG_PRINTF__
 extern void initialise_monitor_handles(void);
 #endif
