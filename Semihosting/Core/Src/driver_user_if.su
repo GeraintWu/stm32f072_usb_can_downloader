@@ -1,7 +1,8 @@
-driver_user_if.c:39:6:CAN_Filter_Init	8	static
-driver_user_if.c:73:9:CAN_Send	24	static
-driver_user_if.c:118:9:USB_Send	24	static
-driver_user_if.c:144:6:HAL_CAN_TxMailbox0CompleteCallback	16	static
-driver_user_if.c:148:6:HAL_CAN_RxFifo0MsgPendingCallback	16	static
-driver_user_if.c:154:6:HAL_CAN_ErrorCallback	16	static
-driver_user_if.c:159:6:USB_Receive_Callback	24	static
+driver_user_if.c:32:6:message_buffer_init	8	static
+driver_user_if.c:48:6:CAN_Filter_Init	8	static
+driver_user_if.c:82:9:CAN_Send	24	static
+driver_user_if.c:127:9:USB_Send	24	static
+driver_user_if.c:154:6:HAL_CAN_TxMailbox0CompleteCallback	16	static
+driver_user_if.c:159:6:HAL_CAN_RxFifo0MsgPendingCallback	16	static
+driver_user_if.c:165:6:HAL_CAN_ErrorCallback	16	static
+driver_user_if.c:170:6:USB_Receive_Callback	24	static

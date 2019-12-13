@@ -54,10 +54,7 @@ extern "C" {
 
 /* Exported functions prototypes ---------------------------------------------*/
 void Error_Handler(void);
-extern void download_app(void);
-#ifdef __DEBUG_PRINTF__
-extern void initialise_monitor_handles(void);
-#endif
+
 /* USER CODE BEGIN EFP */
 
 /* USER CODE END EFP */

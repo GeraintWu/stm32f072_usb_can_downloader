@@ -16,14 +16,11 @@ extern uint8_t USBD_CUSTOM_HID_SendReport(USBD_HandleTypeDef *pdev,
                                    uint8_t *report,
                                    uint16_t len);
 
-static uint8_t payload_1[56]; /* pc -> st -> nxp */
-static uint8_t payload_2[56]; /* nxp -> sy -> pc */
-
 usb_message_t usb_tx_buf;
 usb_message_t usb_rx_buf;
 can_message_t can_tx_buf;
 can_message_t can_rx_buf;
-bool g_usb_rx_complete;
+volatile bool g_usb_rx_complete;
 
 volatile static uint8_t can_tx_complete;
 static CAN_FilterTypeDef sFilterConfig;
@@ -34,10 +31,10 @@ static uint32_t messagebox;
 
 void message_buffer_init(void)
 {
-	usb_rx_buf.msg.data = payload_1;
-	can_tx_buf.data = payload_1;
-	usb_tx_buf.msg.data = payload_2;
-	can_rx_buf.data = payload_2;
+	usb_rx_buf.msg.pdata = usb_rx_buf.msg.payload;
+	can_tx_buf.pdata = usb_rx_buf.msg.payload;
+	usb_tx_buf.msg.pdata = usb_tx_buf.msg.payload;
+	can_rx_buf.pdata = usb_tx_buf.msg.payload;
 }
 
 
@@ -97,27 +94,27 @@ uint8_t CAN_Send(can_message_t *message)
     tickstart = HAL_GetTick();
     while( HAL_CAN_GetTxMailboxesFreeLevel(&hcan) == 0)
     {
-        if((HAL_GetTick()-tickstart) > 0xFFFF)
+        if((HAL_GetTick()-tickstart) > COMM_TIMEOUT)
         {
             // fail to get mailbox
-            return 1;
+            return COMM_FAIL;
         }
     }
 
     can_tx_complete = 0;
     tickstart = HAL_GetTick();
 
-    HAL_CAN_AddTxMessage(&hcan, &can_tx_hd, message->data, &messagebox);
+    HAL_CAN_AddTxMessage(&hcan, &can_tx_hd, message->pdata, &messagebox);
 
     while(can_tx_complete == 0)
     {
         if((HAL_GetTick()-tickstart) > COMM_TIMEOUT)
         {
             //fail to complete send
-            return 1;
+            return COMM_FAIL;
         }
     }
-    return 0;
+    return COMM_OK;
 }
 
 
@@ -129,6 +126,7 @@ uint8_t CAN_Send(can_message_t *message)
  *END**************************************************************************/
 uint8_t USB_Send(usb_message_t *message)
 {
+
     uint32_t tickstart = 0U;
 
     tickstart = HAL_GetTick();
@@ -138,10 +136,10 @@ uint8_t USB_Send(usb_message_t *message)
         if((HAL_GetTick()-tickstart) > COMM_TIMEOUT)
         {
             //fail to send
-            return 1;
+            return COMM_FAIL;
         }
     }
-    return 0;
+    return COMM_OK;
 }
 
 
@@ -157,9 +155,10 @@ void HAL_CAN_TxMailbox0CompleteCallback(CAN_HandleTypeDef *hcan)
 {
     can_tx_complete = 1;
 }
+
 void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 {
-    HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &can_rx_hd, can_rx_buf.data);
+    HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &can_rx_hd, can_rx_buf.pdata);
     can_rx_buf.id = can_rx_hd.ExtId;
 }
 
@@ -170,9 +169,10 @@ void HAL_CAN_ErrorCallback(CAN_HandleTypeDef *hcan)
 
 void USB_Receive_Callback(uint8_t event_idx, uint8_t state)
 {
+	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3, GPIO_PIN_SET);
 
-	//USBD_CUSTOM_HID_HandleTypeDef *hhid = hUsbDeviceFS.pClassData;
-	memcpy(usb_rx_buf.packet, hUsbDeviceFS.pClassData, 64);
+	USBD_CUSTOM_HID_HandleTypeDef *hhid = hUsbDeviceFS.pClassData;
+	memcpy(usb_rx_buf.packet, hhid->Report_buf, 64);
 	g_usb_rx_complete = 1;
 #ifdef __DEBUG_PRINTF__
 	printf("usb data received!\n");

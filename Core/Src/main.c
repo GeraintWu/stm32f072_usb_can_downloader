@@ -105,29 +105,8 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
+
     /* USER CODE BEGIN 3 */
-#if 0
-	usb_tx_buf.msg.cmd = 0x05;
-	usb_tx_buf.msg.length = 10;
-	i=0;
-
-	while(1)
-	{
-
-      if(usb_rx_buf.msg.cmd & 0x00000041 == 'A')
-      {
-    	//memset(usb_rx_buf.packet, 0, 64);
-	    memcpy(usb_tx_buf.packet, usb_rx_buf.packet, 64);
-	    usb_rx_buf.msg.cmd = 0;
-	    USB_Send(&usb_tx_buf);
-#ifdef __DEBUG_PRINTF__
-	 printf("usb data sent!\n");
-#endif
-
-      }
-	  //HAL_Delay(1500);
-	}
-#endif
   }
   /* USER CODE END 3 */
 }
@@ -216,10 +195,32 @@ static void MX_CAN_Init(void)
   */
 static void MX_GPIO_Init(void)
 {
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
 
   /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin : PC3 */
+  GPIO_InitStruct.Pin = GPIO_PIN_3;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : PA5 */
+  GPIO_InitStruct.Pin = GPIO_PIN_5;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
 }
 
