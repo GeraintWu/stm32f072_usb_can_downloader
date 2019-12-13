@@ -7,6 +7,7 @@
 #include "main.h"
 
 static uint8_t message_transport(void);
+static void comm_error(void);
 
 void download_app(void)
 {
@@ -27,10 +28,14 @@ void download_app(void)
 	       printf("ERROR CODE:%d\n", ret);
 #endif
 
+	       if(ret == COMM_FAIL)
+	       {
+	    	   comm_error();
+	       }
 		} // end of if(g_usb_rx_complete == true)
 
 		HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
-        for(i=0;i<800000;i++)
+        for(i=0;i<1600000;i++)
         	if(g_usb_rx_complete == true) break;
 
 	} //end of while(1)
@@ -72,5 +77,11 @@ static uint8_t message_transport(void)
 
 	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3, GPIO_PIN_RESET);
 
+}
+
+static void comm_error(void)
+{
+	memset(usb_tx_buf.packet, 0, sizeof(usb_tx_buf.packet));
+	USB_Send(&usb_tx_buf);
 }
 
