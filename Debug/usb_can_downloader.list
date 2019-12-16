@@ -13297,7 +13297,7 @@ static uint8_t  USBD_CUSTOM_HID_Init(USBD_HandleTypeDef *pdev,
   /* Open EP IN */
   USBD_LL_OpenEP(pdev, CUSTOM_HID_EPIN_ADDR, USBD_EP_TYPE_INTR,
  8004b5a:	6878      	ldr	r0, [r7, #4]
- 8004b5c:	2302      	movs	r3, #2
+ 8004b5c:	2340      	movs	r3, #64	; 0x40
  8004b5e:	2203      	movs	r2, #3
  8004b60:	2181      	movs	r1, #129	; 0x81
  8004b62:	f001 ff4f 	bl	8006a04 <USBD_LL_OpenEP>
@@ -13311,7 +13311,7 @@ static uint8_t  USBD_CUSTOM_HID_Init(USBD_HandleTypeDef *pdev,
   /* Open EP OUT */
   USBD_LL_OpenEP(pdev, CUSTOM_HID_EPOUT_ADDR, USBD_EP_TYPE_INTR,
  8004b6c:	6878      	ldr	r0, [r7, #4]
- 8004b6e:	2302      	movs	r3, #2
+ 8004b6e:	2340      	movs	r3, #64	; 0x40
  8004b70:	2203      	movs	r2, #3
  8004b72:	2101      	movs	r1, #1
  8004b74:	f001 ff46 	bl	8006a04 <USBD_LL_OpenEP>
